@@ -96,6 +96,7 @@ export default function Page() {
             }
             if (reference) {
                 createOrder()
+                setSelectedProducts([])
 
             }
 
