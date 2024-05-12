@@ -7,7 +7,7 @@ import Image from "next/image";
 import { PaystackButton } from 'react-paystack';
 import toast from "react-hot-toast";
 
-export default function page() {
+export default function Page() {
     const { selectedProducts, setSelectedProducts } = useContext(ProductsContext);
     const [productsInfos, setProductsInfos] = useState([]);
     const [address, setAddress] = useState('');
