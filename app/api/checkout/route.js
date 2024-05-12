@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import Order from "../../models/Order";
 import { initMongoose } from "@/app/lib/mongoose";
 
-export async function POST(req, res) {
+export const POST = async (req) => {
     try {
         await initMongoose();
         const { address, city, name, email, line_items, metaData } = await req.json();
@@ -17,7 +17,7 @@ export async function POST(req, res) {
             metaData
         });
 
-        return NextResponse.json(createdOrder);
+        return new NextResponse.json(createdOrder, { status: 200 });
     }
     catch (e) {
         console.error(e);
