@@ -72,7 +72,9 @@ export default function Page() {
             );
 
             const createOrder = async () => {
+                toast.success('Your order has been created ')
                 try {
+
                     await axios.post('/api/checkout', {
                         name,
                         email,
@@ -87,13 +89,14 @@ export default function Page() {
                             currency: "NGN"
                         }
                     })
-                    toast.success('Your order has been created ')
+
                 } catch (error) {
                     console.log(error);
                 }
             }
             if (reference) {
                 createOrder()
+
             }
 
 
