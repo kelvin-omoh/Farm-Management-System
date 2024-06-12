@@ -17,10 +17,10 @@ export const POST = async (req) => {
             metaData
         });
 
-        return new NextResponse.json(createdOrder, { status: 200 });
+        return NextResponse.json(createdOrder, { status: 200 });
     }
     catch (e) {
         console.error(e);
-        return new NextResponse("Internal Server Error", { status: 500 });
+        return NextResponse("Internal Server Error", { status: 500 });
     }
 }

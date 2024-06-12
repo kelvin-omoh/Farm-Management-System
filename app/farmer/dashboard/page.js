@@ -179,9 +179,9 @@ const Page = () => {
                     </div>
 
                     <div className=''>
-                        <LineChart />
+                        {/* <LineChart /> */}
                         <div>
-                            <LatestItems />
+                            {/* <LatestItems /> */}
                         </div>
 
 

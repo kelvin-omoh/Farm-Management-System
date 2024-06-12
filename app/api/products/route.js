@@ -2,28 +2,24 @@ import { NextRequest, NextResponse } from "next/server";
 import Product from "../../models/Product";
 import { initMongoose } from "@/app/lib/mongoose";
 
-
-export async function GET(req, res) {
+export async function GET(req) {
     try {
-
         await initMongoose();
+
         const id = req.nextUrl?.searchParams.get('ids');
 
         if (id) {
             const idsArray = id.split(',');
-            // console.log(idsArray);
-            const ress = await Product.find({
+            const products = await Product.find({
                 '_id': { $in: idsArray }
-            })
-            // console.log(ress);
-            return NextResponse.json(ress);
+            });
+            return NextResponse.json(products);
         } else {
-            return NextResponse.json(await Product.find())
+            const allProducts = await Product.find();
+            return NextResponse.json(allProducts);
         }
-    }
-    catch (e) {
+    } catch (e) {
         console.error(e);
-        return new NextResponse("Internal Server Error", { status: 500 });
+        return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
     }
-
 }
