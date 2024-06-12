@@ -1,18 +1,61 @@
 'use client'
 import Link from "next/link";
 import { usePathname, useRouter } from 'next/navigation'
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { ProductsContext } from "./ProductsContext";
+import { AiOutlineLogin, AiOutlineUser } from 'react-icons/ai'
 
+import provider from "../authProvider";
+import auth from "../../app/firebase.config";
+import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
+import { useAuthState } from 'react-firebase-hooks/auth';
+import Image from "next/image";
 
 export default function Footer() {
 
   const router = useRouter()
+  const [user, loading, error] = useAuthState(auth);
+
 
   const path = usePathname()
 
+  console.log(user);
+
   // const path = router.pathname;
   const { selectedProducts } = useContext(ProductsContext);
+
+  const logout = () => {
+    signOut(auth);
+  };
+
+  const signInWithGoogleAuth = () => {
+    try {
+      signInWithPopup(auth, provider)
+        .then((result) => {
+          // This gives you a Google Access Token. You can use it to access the Google API.
+          const credential = GoogleAuthProvider.credentialFromResult(result);
+          const token = credential.accessToken;
+          // The signed-in user info.
+          const user = result.user;
+          console.log(user);
+          // IdP data available using getAdditionalUserInfo(result)
+          // ...
+        }).catch((error) => {
+          // Handle Errors here.
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          // The email of the user's account used.
+          const email = error.customData?.email;
+          // The AuthCredential type that was used.
+          const credential = GoogleAuthProvider.credentialFromError(error);
+          // ...
+        });
+      // signInWithRedirec(auth, provider);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   return (
     <footer className="sticky bottom-0  bg-white p-5 w-full flex border-t border-gray-200 justify-center space-x-12 text-gray-400">
       <Link href='/' className={(path === '/' ? 'text-emerald-500' : '') + " flex justify-center items-center flex-col"}>
@@ -27,6 +70,20 @@ export default function Footer() {
         </svg>
         <span>Cart {selectedProducts ? selectedProducts?.length : 0}</span>
       </Link>
+      <div className={" flex  text-blue-800  justify-center items-center flex-col"}>
+
+        <span>{loading ? "loading" : error ? "error" : user ? <div className=" flex gap-4 items-center ">
+
+          {user.photoURL ? <Image src={user && user.photoURL} width={1000} height={1000} className={" w-[3rem] h-[3rem] rounded-full"} alt="" />
+            :
+            <AiOutlineUser size={30} />}
+
+          <button onClick={logout}>Log out</button>
+        </div> : <div className=" flex gap-4 items-center ">
+          <AiOutlineLogin />
+          <button onClick={signInWithGoogleAuth}>Login</button>
+        </div>}</span>
+      </div>
     </footer>
   );
 }

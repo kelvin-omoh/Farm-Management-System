@@ -59,7 +59,7 @@ export default function Page() {
     console.log(publicKey);
     const componentProps = {
         email,
-        amount: total * 1000,
+        amount: total * 100,
         metadata: {
             name,
             email,
