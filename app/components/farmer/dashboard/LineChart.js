@@ -1,8 +1,12 @@
 'use client'
-import React from 'react';
-import { Line } from '@ant-design/charts';
+import React, { useEffect, useState } from 'react';
+// import { Line } from '@ant-design/charts';
+import dynamic from 'next/dynamic';
+const Line = dynamic(() => import('@ant-design/charts').then(({ Line }) => Line),
+    { ssr: false }
+);
 
-const data = [
+const staticData = [
     { date: 'Jan 23', inventory: 232, task: 42, liveStock: 49 },
     { date: 'Feb 23', inventory: 241, task: 42, liveStock: 61 },
     { date: 'Mar 23', inventory: 291, task: 42, liveStock: 55 },
@@ -24,56 +28,48 @@ const transformData = (data) => {
     ]);
 };
 
-const config = {
-    data: transformData(data),
-    xField: 'date',
-    yField: 'value',
-    seriesField: 'category',
-    yAxis: {
-        label: {
-            formatter: (v) => `${v}`,
-        },
-    },
-    interactions: [
-        {
-            type: 'tooltip',
-            enable: true,
-        },
-    ],
-    point: {
-        shape: 'circle',
-        size: 4,
-    },
-    legend: {
-        position: 'top',
-    },
-    lineStyle: {
-        lineWidth: 2,
-    },
-    smooth: true,
-
-
-    animation: {
-        appear: {
-            animation: 'path-in',
-            duration: 5000,
-        },
-    },
-    colorField: 'category',
-    color: ['#FF5733', '#33FF57', '#3357FF'], // Red, Green, Blue
-};
-
 const LineChart = () => {
 
-
+    const [data, setData] = useState([]);
+    const config = {
+        data: transformData(data),
+        xField: 'date',
+        yField: 'value',
+        seriesField: 'category',
+        yAxis: {
+            label: {
+                formatter: (v) => `${v}`,
+            },
+        },
+        interactions: [
+            {
+                type: 'tooltip',
+                enable: true,
+            },
+        ],
+        point: {
+            shape: 'circle',
+            size: 4,
+        },
+        smooth: true,
+        animation: {
+            appear: {
+                animation: 'path-in',
+                duration: 5000,
+            },
+        },
+        colorField: 'category',
+        color: ['#FF5733', '#33FF57', '#3357FF'], // Red, Green, Blue
+    };
+    useEffect(() => {
+        // Simulate fetching data (client-side operation)
+        setData(staticData);
+    }, []);
     return (
-        <div className=' '>
+        <div>
             <div className="w-full border-none">
-                <h3 className="font-medium">
-                    Follower metrics
-                </h3>
+                <h3 className="font-medium">Follower metrics</h3>
                 <Line {...config} />
-
             </div>
         </div>
     );
