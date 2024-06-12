@@ -11,7 +11,7 @@ import provider from "./authProvider";
 import HeroSection from "./components/HeroSection";
 import auth from "./firebase.config";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { toast } from "react-toastify";
+import toast from 'react-hot-toast';
 export default function Home() {
   const [phrase, setPhrase] = useState('');
   const [farmProducts, setFarmProducts] = useState([]);

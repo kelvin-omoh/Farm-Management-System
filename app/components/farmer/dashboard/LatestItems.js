@@ -3,7 +3,8 @@ import React, { useEffect, useState } from 'react'
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Pagination, getKeyValue, Spinner } from "@nextui-org/react";
 import { collection, getDocs, onSnapshot, orderBy, query } from 'firebase/firestore';
 import { db } from '@/app/firebase.config';
-import { toast } from 'react-toastify';
+import toast from 'react-hot-toast';
+
 const LatestItems = () => {
     const rows = [
         { id: 1, productName: "Premium Cattle Feed", quantity: 500, price: 5000, location: "Barn", lastUpdated: "2024-06-11", relatedTo: "Livestock" },

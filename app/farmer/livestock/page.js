@@ -6,7 +6,7 @@ import { Button } from "@nextui-org/react";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import React, { useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { toast } from "react-toastify";
+import toast from 'react-hot-toast';
 
 
 const Page = () => {

@@ -3,7 +3,7 @@ import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Pagina
 import { collection, onSnapshot, orderBy, query, where } from 'firebase/firestore';
 import auth, { db } from '@/app/firebase.config';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { toast } from 'react-toastify';
+import toast from 'react-hot-toast';
 
 const LatestTasks = () => {
     const rows = [

@@ -8,7 +8,7 @@ import LatestTasks from '@/app/components/farmer/task/Table';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import auth, { db } from '@/app/firebase.config';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
-import { toast } from 'react-toastify';
+import toast from 'react-hot-toast';
 
 
 const Page = () => {
