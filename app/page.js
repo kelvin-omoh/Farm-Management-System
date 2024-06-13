@@ -98,6 +98,8 @@ export default function Home() {
 
   return (
     <>
+      {/* if nt logged in
+     */}
       {!user?.email ?
         <HeroSection />
         :
