@@ -12,7 +12,7 @@ export default function Layout({ children }) {
     }
   }, []);
   return (
-    <div>
+    <div className=" relative">
       <div className="p-5 min-h-[100vh]">
         {success && (
           <div className="mb-5 bg-green-400 text-white text-lg p-5 rounded-xl">

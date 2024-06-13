@@ -15,9 +15,14 @@ const Sidebar = () => {
     const pathname = usePathname()
     const [user] = useAuthState(auth);
     const router = useRouter()
-    const logout = () => {
-        signOut(auth);
-        router.push('/')
+    const logout = async () => {
+        try {
+            await signOut(auth);
+            router.push('/')
+        } catch (error) {
+            console.log(error);
+        }
+
     };
     const sidebarNav = [
         {
