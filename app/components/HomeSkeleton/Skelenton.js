@@ -7,7 +7,7 @@ const Skelenton = () => {
         <div className=" flex  gap-5 my-[1em]">
             <div>
 
-                <Card className="w-[200px]    space-y-5 p-4" radius="lg">
+                <Card className=" md:w-[30vw] w-[200px]    space-y-5 p-4" radius="lg">
                     <Skeleton className=" w-5/5 rounded-lg">
                         <div className="h-24 rounded-lg bg-default-200 "></div>
                     </Skeleton>
@@ -27,7 +27,7 @@ const Skelenton = () => {
             </div>
             <div>
 
-                <Card className="w-[200px]    space-y-5 p-4" radius="lg">
+                <Card className="md:w-[30vw] w-[200px]    space-y-5 p-4" radius="lg">
                     <Skeleton className=" w-5/5 rounded-lg">
                         <div className="h-24 rounded-lg bg-default-200 "></div>
                     </Skeleton>
@@ -47,7 +47,7 @@ const Skelenton = () => {
             </div>
             <div>
 
-                <Card className="w-[200px]    space-y-5 p-4" radius="lg">
+                <Card className="md:w-[30vw] w-[200px]   space-y-5 p-4" radius="lg">
                     <Skeleton className=" w-5/5 rounded-lg">
                         <div className="h-24 rounded-lg bg-default-200 "></div>
                     </Skeleton>
