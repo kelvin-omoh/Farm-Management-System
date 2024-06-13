@@ -119,7 +119,7 @@ const HeroSection = () => {
 
 
         <div className=' relative h-[100vh] overflow-hidden w-[100vw]'>
-            <div className=' rounded-lg z-20 mx-auto w-[100%] text-center flex flex-col gap-2 items-center absolute  bottom-9 px-[2rem] py-2 justify-center'>
+            <div className=' rounded-lg z-20 mx-auto w-[100%] text-center flex flex-col gap-2 items-center absolute  bottom-[22%] px-[2rem] py-2 justify-center'>
                 <h1 className=' font-[montesearat] mb-3 text-white text-[22px]  '>Discover fresh, quality farm products delivered straight to your door!</h1>
                 <button onClick={signInWithGoogleAsUser} className=' text-[12px] rounded-lg gap-2 px-4 mx-auto text-center flex items-center  py-2 bg-white'> <BsGoogle /> SignIn with Google</button>
             </div>
