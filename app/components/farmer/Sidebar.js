@@ -31,12 +31,12 @@ const Sidebar = () => {
             text: 'Dashboard',
             route: "/farmer/dashboard"
         },
-        // {
-        //     id: 2,
-        //     icon: <BsChat />,
-        //     text: 'Communication',
-        //     route: "/farmer/chat"
-        // },
+        {
+            id: 21,
+            icon: <BsChat />,
+            text: 'Communication',
+            route: "/farmer/chat"
+        },
         {
             id: 2,
             icon: <BsShop />,
