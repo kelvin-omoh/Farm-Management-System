@@ -1,11 +1,15 @@
-'use client'
-import Layout from "../components/Layout";
+'use client';
+
 import { useContext, useEffect, useState } from "react";
-import { ProductsContext } from "../components/ProductsContext";
 import axios from "axios";
 import Image from "next/image";
 import { PaystackButton } from 'react-paystack';
 import toast from "react-hot-toast";
+import { addDoc, collection, getDocs, query, serverTimestamp, where } from "firebase/firestore";
+import { db } from "../firebase.config";
+import { AiFillWarning } from "react-icons/ai";
+import Layout from "../components/Layout";
+import { ProductsContext } from "../components/ProductsContext";
 
 export default function Page() {
     const { selectedProducts, setSelectedProducts } = useContext(ProductsContext);
@@ -16,129 +20,131 @@ export default function Page() {
     const [email, setEmail] = useState('');
 
     useEffect(() => {
-
         const fetchData = async () => {
-            const uniqIds = [...new Set(selectedProducts)];
-            console.log(uniqIds);
-            const res = await axios.get('/api/products?ids=' + uniqIds.join(','))
-            console.log(res.data);
-            setProductsInfos(res.data)
-
-        }
-        fetchData()
-
-
+            if (selectedProducts.length === 0) return;
+            try {
+                const uniqIds = [...new Set(selectedProducts)];
+                const productsSnapshot = await getDocs(query(collection(db, 'products'), where('id', 'in', uniqIds)));
+                const productsData = productsSnapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data(),
+                }));
+                setProductsInfos(productsData);
+            } catch (error) {
+                console.error('Error fetching selected products:', error);
+            }
+        };
+        fetchData();
     }, [selectedProducts]);
 
-    console.log(selectedProducts);
+    const handleQuantityChange = (id, increment) => {
+        setSelectedProducts(prev => {
+            const updated = [...prev];
+            const index = updated.indexOf(id);
+            if (increment > 0) {
+                updated.push(id);
+            } else if (index !== -1) {
+                updated.splice(index, 1);
+            }
+            return updated;
+        });
+    };
 
-    function moreOfThisProduct(id) {
-        setSelectedProducts(prev => [...prev, id]);
-    }
-    function lessOfThisProduct(id) {
-        const pos = selectedProducts.indexOf(id);
-        if (pos !== -1) {
-            setSelectedProducts(prev => {
-                return prev.filter((value, index) => index !== pos);
-            });
+    const verifyTransaction = async (reference) => {
+        try {
+            const response = await axios.get(`/api/transaction/verify/${reference}`);
+            const transactionStatus = response.data.data.status;
+
+            const createdAt = serverTimestamp();
+            const productDetails = productsInfos.reduce((details, productInfo) => {
+                const quantity = selectedProducts.filter(id => id === productInfo.id).length;
+                if (quantity > 0) {
+                    details.push({ name: productInfo.productName, quantity });
+                }
+                return details;
+            }, []);
+            const paid = transactionStatus === "success";
+            const orderData = {
+                productDetails,
+                email,
+                address,
+                city,
+                createdAt,
+                reference,
+                paid,
+                amount: total,
+                metaData: {
+                    reference,
+                    amount: total,
+                    currency: "NGN"
+                }
+            };
+
+            await addDoc(collection(db, 'orders'), orderData);
+            toast.success("Your order was successfully processed!");
+            setSelectedProducts([]);
+
+        } catch (error) {
+            console.log(error);
+            toast.error("Error processing your order. Please try again.");
         }
-    }
+    };
 
     const deliveryPrice = 500;
-    let subtotal = 0;
-    if (selectedProducts?.length) {
-        for (let id of selectedProducts) {
-            const price = productsInfos?.find(p => p._id === id)?.price || 0;
-            subtotal += price;
-        }
-    }
+    const subtotal = selectedProducts.reduce((sum, id) => {
+        const product = productsInfos.find(p => p.id === id);
+        return sum + (product ? product.price : 0);
+    }, 0);
     const total = subtotal + deliveryPrice;
 
-    const publicKey = process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY
+    const publicKey = process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY;
 
-    console.log(publicKey);
     const componentProps = {
         email,
         amount: total * 100,
-        metadata: {
-            name,
-            email,
-        },
+        metadata: { name, email },
         publicKey,
         text: "Pay Now",
-        onSuccess: ({ reference }) => {
-            alert(
-                `Your purchase was successful! Transaction reference: ${reference}`
-            );
-
-            const createOrder = async () => {
-                toast.success('Your order has been created ')
-                try {
-
-                    await axios.post('/api/checkout', {
-                        name,
-                        email,
-                        line_items: selectedProducts,
-                        address,
-                        city,
-                        reference,
-                        amount: total,
-                        metaData: {
-                            reference,
-                            amount: total,
-                            currency: "NGN"
-                        }
-                    })
-
-                } catch (error) {
-                    console.log(error);
-                }
-            }
-            if (reference) {
-                createOrder()
-                setSelectedProducts([])
-
-            }
-
-
-        },
-        onClose: () => alert("Are you sure , you dont want to continue !!!!"),
-    }
-
+        onSuccess: ({ reference }) => verifyTransaction(reference),
+        onClose: () => toast(
+            <div className="shadow-lg border bg-white rounded-lg px-4 py-2 flex gap-4 items-center">
+                <AiFillWarning size={40} className="text-[#ffa346]" />
+                Transaction closed. Are you sure you don't want to continue? Try again!
+            </div>
+        )
+    };
 
     return (
         <Layout>
-            {selectedProducts.length === 0 && (
-                <div>no products in your shopping cart</div>
-            )}
-            {productsInfos?.length && productsInfos?.map(productInfo => {
-                const amount = selectedProducts?.filter(id => id === productInfo._id)?.length;
-                if (amount === 0) return;
-                return (
-                    <div className="flex mb-5 items-center" key={productInfo._id}>
-                        <div className="bg-gray-100 p-3 rounded-xl shrink-0" style={{ boxShadow: 'inset 1px 0px 10px 10px rgba(0,0,0,0.1)' }}>
-                            <div className=" h-[10rem] w-[10rem]">
-                                <Image width={1000} height={1000} className=" w-full h-full object-cover " src={productInfo.picture} alt="" />
-
+            {selectedProducts.length === 0 ? (
+                <div>No products in your shopping cart</div>
+            ) : (
+                productsInfos.map(productInfo => {
+                    const quantity = selectedProducts.filter(id => id === productInfo.id).length;
+                    if (quantity === 0) return null;
+                    return (
+                        <div className="flex mb-5 items-center" key={productInfo.id}>
+                            <div className="bg-gray-100 p-3 rounded-xl shrink-0" style={{ boxShadow: 'inset 1px 0px 10px 10px rgba(0,0,0,0.1)' }}>
+                                <div className="h-[10rem] w-[10rem]">
+                                    <Image width={1000} height={1000} className="w-full h-full object-cover" src={productInfo.images[0]} alt={productInfo.productName} />
+                                </div>
                             </div>
-                        </div>
-                        <div className="pl-4 items-center">
-                            <h3 className="font-bold text-lg">{productInfo.name}</h3>
-                            <p className="text-sm leading-4 text-gray-500">{productInfo.description}</p>
-                            <div className="flex mt-1">
-                                <div className="grow font-bold">₦{productInfo.price}</div>
-                                <div>
-                                    <button onClick={() => lessOfThisProduct(productInfo._id)} className="border border-emerald-500 px-2 rounded-lg text-emerald-500">-</button>
-                                    <span className="px-2">
-                                        {selectedProducts.filter(id => id === productInfo._id).length}
-                                    </span>
-                                    <button onClick={() => moreOfThisProduct(productInfo._id)} className="bg-emerald-500 px-2 rounded-lg text-white">+</button>
+                            <div className="pl-4 items-center">
+                                <h3 className="font-bold text-lg">{productInfo.productName}</h3>
+                                <p className="text-sm leading-4 text-gray-500">{`${productInfo.description.slice(0, 30)}...`}</p>
+                                <div className="flex mt-1">
+                                    <div className="grow font-bold">₦{productInfo.price}</div>
+                                    <div>
+                                        <button onClick={() => handleQuantityChange(productInfo.id, -1)} className="border border-emerald-500 px-2 rounded-lg text-emerald-500">-</button>
+                                        <span className="px-2">{quantity}</span>
+                                        <button onClick={() => handleQuantityChange(productInfo.id, 1)} className="bg-emerald-500 px-2 rounded-lg text-white">+</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                )
-            })}
+                    );
+                })
+            )}
             <form method="POST">
                 <div className="mt-8">
                     <input name="address" value={address} onChange={e => setAddress(e.target.value)} className="bg-gray-100 w-full rounded-lg px-4 py-2 mb-2" type="text" placeholder="Street address, number" />
@@ -161,8 +167,6 @@ export default function Page() {
                     </div>
                 </div>
                 <input type="hidden" name="products" value={selectedProducts.join(',')} />
-
-
             </form>
             <PaystackButton className="paystack-button bg-emerald-500 px-5 py-2 rounded-xl font-bold text-white w-full my-4 shadow-emerald-300 shadow-lg" {...componentProps} />
         </Layout>

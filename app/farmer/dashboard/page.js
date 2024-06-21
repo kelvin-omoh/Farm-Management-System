@@ -15,9 +15,50 @@ const Page = () => {
     const [products, setProducts] = useState([]);
     const [tasks, setTasks] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [allOrders, setAllOrders] = useState([]);
+    const [totalRevenue, setTotalRevenue] = useState(0);
+
 
     const [user, error] = useAuthState(auth);
 
+    useEffect(() => {
+        const q = query(collection(db, "orders"), orderBy("createdAt", "desc"));
+        const unsubscribe = onSnapshot(q, (querySnapshot) => {
+            const orders = querySnapshot.docs.map((doc) => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+            console.log(orders);
+            setAllOrders(orders);
+        }, (error) => {
+            toast.error("Failed to fetch orders");
+        });
+
+        return () => unsubscribe();
+    }, []);
+
+
+    useEffect(() => {
+        let newTotal = 0;
+        for (const order of allOrders) {
+            console.log(order)
+            if (order.paid) {
+                newTotal += order.amount;
+            }
+        }
+        console.log(newTotal);
+        setTotalRevenue(newTotal);
+        console.log(totalRevenue);
+    }, [allOrders, totalRevenue]);
+
+
+    const calculateTotalRevenue = (orders) => {
+        const total = orders.reduce((sum, order) => {
+            return sum + (order.paid ? order.amount : 0);
+        }, 0);
+        setTotalRevenue(total);
+
+    };
 
     useEffect(() => {
         const q = query(collection(db, "products"), orderBy("createdAt", "desc"));
@@ -27,17 +68,7 @@ const Page = () => {
                 ...doc.data(),
 
             }));
-
-            if (user && user?.displayName) {
-                console.log(productsData.filter((product) => product.by === user?.displayName));
-
-                setProducts(productsData.filter((product) => product.by === user?.displayName));
-
-            } else {
-                setProducts(productsData);
-            }
-
-
+            setProducts(productsData);
             setLoading(false);
         }, (error) => {
             toast.error("Failed to fetch products");
@@ -45,7 +76,7 @@ const Page = () => {
         });
 
         return () => unsubscribe();
-    }, [user]);
+    }, []);
 
 
 
@@ -57,25 +88,14 @@ const Page = () => {
                 ...doc.data(),
 
             }));
-
-            if (user && user?.displayName) {
-                console.log(tasksData.filter((tasks) => tasks.by === user?.displayName));
-
-                setTasks(tasksData.filter((tasks) => tasks.by === user?.displayName));
-
-            } else {
-                setProducts(tasksData);
-            }
-
-
+            setTasks(tasksData);
             setLoading(false);
         }, (error) => {
             toast.error("Failed to fetch products");
             setLoading(false);
         });
-
         return () => unsubscribe();
-    }, [user]);
+    }, []);
 
 
 
@@ -90,19 +110,16 @@ const Page = () => {
             const liveStocksData = querySnapshot.docs.map((doc) => ({
                 id: doc.id,
                 ...doc.data(),
-
             }));
-            console.log(liveStocksData.filter((product) => product.by === user?.displayName));
-
-            setLiveStocks(liveStocksData.filter((product) => product.by === user?.displayName));
+            console.log(liveStocksData);
+            setLiveStocks(liveStocksData);
             setLoading(false);
         }, (error) => {
             toast.error("Failed to fetch livestock");
             setLoading(false);
         });
-
         return () => unsubscribe();
-    }, [user]);
+    }, []);
 
     const topBar = useMemo(() => {
 
@@ -112,7 +129,7 @@ const Page = () => {
                 id: 1,
                 icon: <h1 className=' text-[40px] leading-[1px]  '> ₦</h1>,
                 text: ' Revenue',
-                value: '500,000'
+                value: totalRevenue?.toFixed(2) || 0
             },
             {
                 id: 2,
@@ -140,7 +157,7 @@ const Page = () => {
             },
         ]
 
-    }, [products.length, liveStocks.length, user]);
+    }, [products.length, totalRevenue, liveStocks.length, user]);
 
     const fecthWeatherApi = async () => {
         try {
@@ -149,7 +166,6 @@ const Page = () => {
         } catch (error) {
             console.log(error);
         }
-
     }
     useEffect(() => {
         fecthWeatherApi()

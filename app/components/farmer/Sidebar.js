@@ -66,7 +66,7 @@ const Sidebar = () => {
             id: 5,
             icon: <BsCartDashFill />,
             text: 'Orders',
-            route: "#"
+            route: "/farmer/orders"
         },
         {
             id: 5,

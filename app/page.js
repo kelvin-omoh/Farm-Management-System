@@ -15,7 +15,7 @@ import toast from 'react-hot-toast';
 import { AiOutlineBars } from "react-icons/ai";
 import { useRouter } from "next/navigation";
 import { BsGoogle, BsX } from "react-icons/bs";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { collection, doc, getDoc, onSnapshot, orderBy, query, setDoc } from "firebase/firestore";
 export default function Home() {
   const [phrase, setPhrase] = useState('');
   const [farmProducts, setFarmProducts] = useState([]);
@@ -26,16 +26,26 @@ export default function Home() {
 
 
   useEffect(() => {
-    const fetchProduct = async () => {
-      const res = await axios.get("/api/products")
-      console.log(res.data);
-      setFarmProducts(res.data)
+    const q = query(collection(db, "products"), orderBy("createdAt", "desc"));
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const productsData = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      console.log(productsData);
+      const productsWithImage = productsData.map(product => ({
+        ...product,
+        image: product.images?.[0] || ''
+      }));
+      setFarmProducts(productsWithImage);
+      setLoading(false);
+    }, (error) => {
+      toast.error("Failed to fetch products");
+      setLoading(false);
+    });
 
-    }
-    fetchProduct()
-
-    return () => { }
-  }, [])
+    return () => unsubscribe();
+  }, []);
 
 
   console.log(farmProducts);
@@ -43,11 +53,11 @@ export default function Home() {
 
   let products = farmProducts
   useCallback(() => farmProducts, [farmProducts])
-  const categoriesNames = [...new Set(farmProducts?.map(p => p.category))];
+  const categoriesNames = [...new Set(farmProducts?.map(p => p.relatedTo))];
   console.log(categoriesNames);
 
   if (phrase) {
-    products = farmProducts.filter(p => p.name.toLowerCase().includes(phrase));
+    products = farmProducts.filter(p => p.productName.toLowerCase().includes(phrase));
   }
 
   const createFarmerDocument = async (farmer) => {
@@ -172,13 +182,13 @@ export default function Home() {
 
             {categoriesNames.map(categoryName => (
               <div className="" key={categoryName}>
-                {products.find(p => p.category === categoryName) && (
+                {products.find(p => p.relatedTo === categoryName) && (
                   <div>
                     <h2 className="text-2xl py-5 capitalize">{categoryName}</h2>
                     <div className="flex -mx-5 overflow-x-scroll snap-x scrollbar-hide">
 
-                      {products.filter(p => p.category === categoryName).map(productInfo => (
-                        <div key={productInfo._id} className="px-5 snap-start">
+                      {products.filter(p => p.relatedTo === categoryName).map(productInfo => (
+                        <div key={productInfo.id} className="px-5 snap-start">
                           <Product {...productInfo} />
                         </div>
                       ))}

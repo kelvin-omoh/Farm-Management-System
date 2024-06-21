@@ -118,7 +118,7 @@ const HeroSection = () => {
     return (
 
 
-        <div className='bg-black relative h-[100vh]  overflow-hidden w-[100vw]'>
+        <div className='bg-black  relative h-[100vh]  overflow-hidden w-[100vw]'>
             <div className=' rounded-lg z-20 mx-auto w-[100%] text-center flex flex-col gap-2 items-center absolute  bottom-[22%] px-[2rem] py-2 justify-center'>
                 <h1 className=' font-[montesearat] mb-3 text-white text-[22px]  '>Discover fresh, quality farm products delivered straight to your door!</h1>
                 <button onClick={signInWithGoogleAsUser} className=' text-[12px] rounded-lg gap-2 px-4 mx-auto text-center flex items-center  py-2 bg-white'> <BsGoogle /> SignIn with Google</button>
@@ -135,7 +135,7 @@ const HeroSection = () => {
                 </button>
 
             </div>
-            <div className={` bg-green-900/50 backdrop-blur-sm h-[90%] mx-auto  rounded-lg z-20 w-full  flex flex-col gap-2 items-center absolute    right-0 py-2 justify-end   transition-all delay-100 ${toggle ? 'top-[4.5rem]' : 'top-[-1000rem]'}     `}>
+            <div className={` bg-green-900/50  overflow-hidden backdrop-blur-sm h-[90%] mx-auto  rounded-lg z-20 w-full  flex flex-col gap-2 items-center absolute    right-0 py-2 justify-end   transition-all delay-100 ${toggle ? 'top-[4.5rem]' : 'top-[-1000rem]'}     `}>
 
                 <ul className=' m-auto w-ful gap-6 h-full flex justify-center items-center flex-col'>
                     <li className=' font-[montesearat] mb-3 text-white text-[42px]  '>Welcome to FMS</li>
@@ -145,7 +145,7 @@ const HeroSection = () => {
                 </ul>
             </div>
 
-            <Carousel infiniteLoop={true} transitionTime={1} autoPlay={true} className=' w-[100vw] h-[100vh] bg-black ' showArrows={false}>
+            <Carousel infiniteLoop={true} transitionTime={1} autoPlay={true} className=' w-[100vw]  overflow-hidden h-[100vh] bg-black ' showArrows={false}>
                 <div className='relative w-[100vw] h-[100vh]'>
                     <Image
                         width={1000}
