@@ -8,8 +8,10 @@ export default function Product({ id, productName, price, description, image }) 
   function addProduct() {
     setSelectedProducts(prev => [...prev, id]);
     console.log(selectedProducts);
+    console.log(id);
     toast.success('succesfully added to your cart')
   }
+
   return (
     <div className="  w-56 ">
       <div className="bg-blue-100 p-5 h-[15rem] w-[15em] rounded-xl">

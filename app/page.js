@@ -189,6 +189,7 @@ export default function Home() {
 
                       {products.filter(p => p.relatedTo === categoryName).map(productInfo => (
                         <div key={productInfo.id} className="px-5 snap-start">
+                          {console.log(productInfo)}
                           <Product {...productInfo} />
                         </div>
                       ))}

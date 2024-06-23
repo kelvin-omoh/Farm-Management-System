@@ -20,7 +20,6 @@ const Page = () => {
 
 
     const [user, error] = useAuthState(auth);
-
     useEffect(() => {
         const q = query(collection(db, "orders"), orderBy("createdAt", "desc"));
         const unsubscribe = onSnapshot(q, (querySnapshot) => {
@@ -28,7 +27,6 @@ const Page = () => {
                 id: doc.id,
                 ...doc.data()
             }));
-            console.log(orders);
             setAllOrders(orders);
         }, (error) => {
             toast.error("Failed to fetch orders");
@@ -41,15 +39,12 @@ const Page = () => {
     useEffect(() => {
         let newTotal = 0;
         for (const order of allOrders) {
-            console.log(order)
             if (order.paid) {
                 newTotal += order.amount;
             }
         }
-        console.log(newTotal);
         setTotalRevenue(newTotal);
-        console.log(totalRevenue);
-    }, [allOrders, totalRevenue]);
+    }, [allOrders]);
 
 
     const calculateTotalRevenue = (orders) => {
@@ -88,14 +83,16 @@ const Page = () => {
                 ...doc.data(),
 
             }));
-            setTasks(tasksData);
+
+            const newTasksData = tasksData.filter(task => task.by === user?.displayName)
+            setTasks(newTasksData);
             setLoading(false);
         }, (error) => {
             toast.error("Failed to fetch products");
             setLoading(false);
         });
         return () => unsubscribe();
-    }, []);
+    }, [user]);
 
 
 

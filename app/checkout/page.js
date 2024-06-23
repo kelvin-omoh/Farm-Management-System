@@ -1,15 +1,17 @@
 'use client';
 
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import axios from "axios";
 import Image from "next/image";
 import { PaystackButton } from 'react-paystack';
 import toast from "react-hot-toast";
-import { addDoc, collection, getDocs, query, serverTimestamp, where } from "firebase/firestore";
+import { addDoc, collection, getDocs, onSnapshot, query, serverTimestamp, where } from "firebase/firestore";
 import { db } from "../firebase.config";
 import { AiFillWarning } from "react-icons/ai";
 import Layout from "../components/Layout";
 import { ProductsContext } from "../components/ProductsContext";
+import Skeleton from "react-loading-skeleton"; // Skeleton screen library
+import 'react-loading-skeleton/dist/skeleton.css';
 
 export default function Page() {
     const { selectedProducts, setSelectedProducts } = useContext(ProductsContext);
@@ -18,26 +20,40 @@ export default function Page() {
     const [city, setCity] = useState('');
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
+    const [loading, setLoading] = useState(false);
+
+    const fetchData = useCallback(async () => {
+        if (selectedProducts.length === 0) return;
+        try {
+            setLoading(true);
+            const uniqIds = [...new Set(selectedProducts)];
+            console.log(selectedProducts);
+            const productsSnapshot = await getDocs(query(collection(db, 'products'), where('__name__', 'in', uniqIds)))
+            const productsData = productsSnapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data(),
+            }));
+            setProductsInfos(productsData);
+            console.log(productsData);
+            setLoading(false);
+        } catch (error) {
+            console.error('Error fetching selected products:', error);
+            setLoading(false);
+        }
+    }, []);
 
     useEffect(() => {
-        const fetchData = async () => {
-            if (selectedProducts.length === 0) return;
-            try {
-                const uniqIds = [...new Set(selectedProducts)];
-                const productsSnapshot = await getDocs(query(collection(db, 'products'), where('id', 'in', uniqIds)));
-                const productsData = productsSnapshot.docs.map(doc => ({
-                    id: doc.id,
-                    ...doc.data(),
-                }));
-                setProductsInfos(productsData);
-            } catch (error) {
-                console.error('Error fetching selected products:', error);
-            }
-        };
         fetchData();
-    }, [selectedProducts]);
+        if (selectedProducts.length > 0) {
+            const unsubscribe = onSnapshot(
+                query(collection(db, 'products'), where('id', 'in', selectedProducts)),
+                fetchData
+            );
+            return () => unsubscribe();
+        }
+    }, []);
 
-    const handleQuantityChange = (id, increment) => {
+    const handleQuantityChange = useCallback((id, increment) => {
         setSelectedProducts(prev => {
             const updated = [...prev];
             const index = updated.indexOf(id);
@@ -48,9 +64,10 @@ export default function Page() {
             }
             return updated;
         });
-    };
+    }, []);
 
-    const verifyTransaction = async (reference) => {
+
+    const verifyTransaction = useCallback(async (reference) => {
         try {
             const response = await axios.get(`/api/transaction/verify/${reference}`);
             const transactionStatus = response.data.data.status;
@@ -79,22 +96,43 @@ export default function Page() {
                     currency: "NGN"
                 }
             };
-
-            await addDoc(collection(db, 'orders'), orderData);
             toast.success("Your order was successfully processed!");
             setSelectedProducts([]);
+            await addDoc(collection(db, 'orders'), orderData);
+            setEmail('')
+            setName('')
+            setCity('')
+            setAddress('')
 
+
+
+
+            // sendEmailNotification(email, orderData); // Send email notification
         } catch (error) {
             console.log(error);
             toast.error("Error processing your order. Please try again.");
         }
-    };
+    }, [productsInfos, selectedProducts, address, city, email]);
+
+    // const sendEmailNotification = async (email, orderData) => {
+    //     try {
+    //         await axios.post('/api/send-email', {
+    //             to: email,
+    //             subject: 'Thank you for your order',
+    //             text: 'Your order has been successfully placed. Here are the details...',
+    //             html: `<p>Thank you for your order. Here are the details:</p><pre>${JSON.stringify(orderData, null, 2)}</pre>`
+    //         });
+    //     } catch (error) {
+    //         console.error('Error sending email:', error);
+    //     }
+    // };
 
     const deliveryPrice = 500;
     const subtotal = selectedProducts.reduce((sum, id) => {
         const product = productsInfos.find(p => p.id === id);
         return sum + (product ? product.price : 0);
     }, 0);
+
     const total = subtotal + deliveryPrice;
 
     const publicKey = process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY;
@@ -124,11 +162,15 @@ export default function Page() {
                     if (quantity === 0) return null;
                     return (
                         <div className="flex mb-5 items-center" key={productInfo.id}>
-                            <div className="bg-gray-100 p-3 rounded-xl shrink-0" style={{ boxShadow: 'inset 1px 0px 10px 10px rgba(0,0,0,0.1)' }}>
-                                <div className="h-[10rem] w-[10rem]">
-                                    <Image width={1000} height={1000} className="w-full h-full object-cover" src={productInfo.images[0]} alt={productInfo.productName} />
+                            {loading ? (
+                                <Skeleton height={160} width={160} />
+                            ) : (
+                                <div className="bg-gray-100 p-3 rounded-xl shrink-0" style={{ boxShadow: 'inset 1px 0px 10px 10px rgba(0,0,0,0.1)' }}>
+                                    <div className="h-[10rem] w-[10rem]">
+                                        <Image width={1000} height={1000} className="w-full h-full object-cover" src={productInfo.images[0]} alt={productInfo.productName} />
+                                    </div>
                                 </div>
-                            </div>
+                            )}
                             <div className="pl-4 items-center">
                                 <h3 className="font-bold text-lg">{productInfo.productName}</h3>
                                 <p className="text-sm leading-4 text-gray-500">{`${productInfo.description.slice(0, 30)}...`}</p>
