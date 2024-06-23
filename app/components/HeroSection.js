@@ -141,7 +141,8 @@ const HeroSection = () => {
                     <li className=' font-[montesearat] mb-3 text-white text-[42px]  '>Welcome to FMS</li>
                     <li className=' font-[montesearat]  text-white text-[22px]'> SignIn as Farmer
                     </li>
-                    <li><button onClick={signInWithGoogleAsFarmer} className=' text-[12px] rounded-lg gap-2 px-4 mx-auto text-center flex items-center  py-2 bg-white'> <BsGoogle /> SignIn with Google</button></li>
+                    <li className=' hidden md:block'><button onClick={signInWithGoogleAsFarmer} className=' text-[12px] rounded-lg gap-2 px-4 mx-auto text-center flex items-center  py-2 bg-white'> <BsGoogle /> SignIn with Google</button></li>
+                    <li className=' block md:hidden'><button className=' text-[12px] rounded-lg gap-2 px-4 mx-auto text-center flex items-center  py-2 bg-white'>Not Available On Mobile Switch To Desktop</button></li>
                 </ul>
             </div>
 
