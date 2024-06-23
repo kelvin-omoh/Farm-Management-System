@@ -123,7 +123,7 @@ export default function Home() {
 
               }
             </Button>
-            <input value={phrase} onChange={e => setPhrase(e.target.value)} type="text" placeholder="Search for products..." className="bg-white w-[90%] py-2 px-4 rounded-xl" />
+            <input value={phrase} onChange={e => setPhrase(e.target.value?.toLowerCase())} type="text" placeholder="Search for products..." className="bg-white w-[90%] py-2 px-4 rounded-xl" />
           </div>
 
           <div className={` bg-green-900/50 backdrop-blur-sm h-[90vh] mx-auto  rounded-lg z-20 w-full  flex flex-col gap-2 items-center fixed    right-0 py-2 justify-end   transition-all delay-100 top-[4.5rem] ${toggle ? 'left-0' : 'left-[-500rem] '}     `}>
