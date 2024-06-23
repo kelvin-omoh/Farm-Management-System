@@ -147,7 +147,7 @@ export default function Page() {
         onClose: () => toast(
             <div className="shadow-lg border bg-white rounded-lg px-4 py-2 flex gap-4 items-center">
                 <AiFillWarning size={40} className="text-[#ffa346]" />
-                Transaction closed. Are you sure you don't want to continue? Try again!
+                Transaction closed. Are you sure you don&apos;t want to continue? Try again!
             </div>
         )
     };
