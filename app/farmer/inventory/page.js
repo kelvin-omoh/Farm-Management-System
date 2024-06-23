@@ -144,24 +144,20 @@ const Page = () => {
                 if (!user?.displayName) {
                     throw new Error("You are not signed in!");
                 }
-                const newProductId = newProductRef.id;
+                // const newProductId = newProductRef.id;
                 // Create a new document with an auto-generated ID
                 const newProductRef = await addDoc(collection(db, "products"), {
                     ...formData,
                     price: Number(formData.price),
                     createdAt,
-                    id: newProductId,
                     by: user.displayName
                 });
 
                 toast.success("Product added to the inventory successfully!");
 
-                // Use the generated document ID as the product ID
 
-                setFormData(prevState => ({
-                    ...prevState,
-                    id: newProductId // Set the product ID in the form data
-                }));
+
+
             }
 
             // Reset form and selected product

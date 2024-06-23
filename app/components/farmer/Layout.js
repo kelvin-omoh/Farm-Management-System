@@ -10,7 +10,7 @@ const Layout = ({ children }) => {
     return (
         <div className=' relative flex-row w-full flex gap-3'>
             <Sidebar />
-            <div className='ml-[14rem] w-full ' >
+            <div className='ml-[14rem] w-[80%] ' >
                 <AntdRegistry>{children}</AntdRegistry>
             </div>
         </div>

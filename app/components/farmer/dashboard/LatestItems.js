@@ -8,6 +8,7 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import Image from 'next/image';
 import { BsEye, BsPen, BsTrash } from 'react-icons/bs';
 import AppContext from '../../Context/AppContext';
+import { unparse } from 'papaparse';
 
 const LatestItems = () => {
     const rows = [
@@ -107,6 +108,32 @@ const LatestItems = () => {
         vacation: "warning",
     };
 
+    // console.log(columns.filter(column => column.key !== 'actions').map(column => `"${column.key}"`))
+
+    const exportToCsv = () => {
+        const updatedColumns = columns.filter(column =>
+            column.key !== 'actions' &&
+            column.key !== 'createdAt' &&
+            column.key !== 'images' &&
+            column.key !== 'id'
+        );
+
+        const csv = unparse(products, {
+            fields: updatedColumns.map(column => column.key),
+        });
+
+        const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "inventory.csv";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
+
+
 
     const renderCell = React.useCallback((product, columnKey) => {
         const cellValue = product[columnKey];
@@ -195,8 +222,11 @@ const LatestItems = () => {
 
 
     return (
-        <>
+        <div className=' w-full'>
             <h1 className='my-4'>Latest Items</h1>
+            <button className='ml-auto bg-white border border-green-600 my-6 justify-end flex outline-[3px] outline-green-600 text-green-700 px-4 py-2' onClick={() => exportToCsv()}>
+                Export to CSV
+            </button>
 
             {loading ? <Spinner className=' mx-auto w-full' /> :
                 <Table aria-label="Example table with custom cells" bottomContent={
@@ -227,7 +257,7 @@ const LatestItems = () => {
                         )}
                     </TableBody>
                 </Table>}
-        </>
+        </div>
     );
 }
 
