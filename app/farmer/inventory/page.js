@@ -281,7 +281,7 @@ const Page = () => {
                             <div key={link} className="h-24 bg-white p-4 shadow-sm rounded-sm border border-gray-200">
                                 <BsX onClick={() => removeImage(index)} className="w-6 cursor-pointer" />
                                 <div className='size-[50px]'>
-                                    <img src={link} alt="" className="w-full h-full object-cover rounded-lg" />
+                                    <Image height={1000} width={1000} src={link} alt="" className="w-full h-full object-cover rounded-lg" />
                                 </div>
                             </div>
                         ))}
