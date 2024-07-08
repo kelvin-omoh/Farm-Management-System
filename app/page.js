@@ -247,7 +247,7 @@ export default function Home() {
                   </div>
                   <h2 className="text-xl mx-auto flex justify-center font-semibold">{product.title}</h2>
                   <p className="text-xl mx-auto flex justify-center font-semibold">{product.description}</p>
-                  <p className="text-xl mx-auto flex justify-center  text-green-600 font-bold">${product.price}</p>
+                  <p className="text-xl mx-auto flex justify-center  text-green-600 font-bold"> ₦{product.price}</p>
                 </div>
               ))}
             </Slider>
