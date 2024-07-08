@@ -90,7 +90,9 @@ const page = () => {
                             {items.map((product) => (
                                 <div key={product.id} className="p-4 bg-blue-950/80 text-white shadow-md rounded-lg mx-2">
                                     <div className="w-full   h-[60vh] mb-4">
-                                        <img
+                                        <Image
+                                            width={1000}
+                                            height={1000}
                                             src={product.imageUrl}
                                             alt={product.title}
                                             className="w-[70%] object-contain object-center h-full rounded-t-lg"

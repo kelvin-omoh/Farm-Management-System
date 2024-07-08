@@ -236,7 +236,9 @@ export default function Home() {
               {advertProducts.map((product) => (
                 <div key={product.id} className="p-4 flex justify-center  w-full to-blue-900  bg-gradient-to-r from-[black] text-white shadow-md rounded-lg mx-2">
                   <div className="w-full   h-[60vh] mb-4">
-                    <img
+                    <Image
+                      width={1000}
+                      height={1000}
                       src={product.imageUrl}
                       alt={product.title}
                       className="w-full object-contain object-center h-full rounded-t-lg"
