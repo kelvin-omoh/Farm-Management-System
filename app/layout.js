@@ -4,6 +4,7 @@ import { ProductsContextProvider } from "./components/ProductsContext";
 import toast, { Toaster } from 'react-hot-toast';
 import { NextUIProvider } from "@nextui-org/react";
 import { Providers } from "./MainLayout";
+import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
 
 
 const inter = Inter({ subsets: ["latin"] });

@@ -3,7 +3,7 @@
 import { usePathname, useRouter } from 'next/navigation'
 import Link from 'next/link';
 import React from 'react'
-import { AiOutlineBarChart, AiOutlineBars } from 'react-icons/ai'
+import { AiOutlineBarChart, AiOutlineBars, AiOutlineBook } from 'react-icons/ai'
 import { BsBookmark, BsCartDashFill, BsChat, BsChatFill, BsGraphUp, BsPerson, BsShop } from 'react-icons/bs'
 import { GiMailbox, GiSittingDog } from "react-icons/gi";
 import Image from 'next/image';
@@ -67,6 +67,12 @@ const Sidebar = () => {
             icon: <BsCartDashFill />,
             text: 'Orders',
             route: "/farmer/orders"
+        },
+        {
+            id: 6,
+            icon: <AiOutlineBook />,
+            text: 'Advert',
+            route: "/farmer/advert"
         },
         {
             id: 5,

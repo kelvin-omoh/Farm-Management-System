@@ -15,6 +15,9 @@ import toast from 'react-hot-toast';
 import { AiOutlineBars } from "react-icons/ai";
 import { useRouter } from "next/navigation";
 import { BsGoogle, BsX } from "react-icons/bs";
+import Slider from "react-slick";
+import 'slick-carousel/slick/slick.css';
+import 'slick-carousel/slick/slick-theme.css';
 import { collection, doc, getDoc, onSnapshot, orderBy, query, setDoc } from "firebase/firestore";
 export default function Home() {
   const [phrase, setPhrase] = useState('');
@@ -23,7 +26,7 @@ export default function Home() {
   const [toggle, setToggle] = useState(false)
   const navigate = useRouter();
   const [loading, setLoading] = useState(false);
-
+  const [advertProducts, setAdvertProducts] = useState([]);
 
   useEffect(() => {
     const q = query(collection(db, "products"), orderBy("createdAt", "desc"));
@@ -106,6 +109,55 @@ export default function Home() {
     }
   };
 
+
+  const settings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 3,
+    autoplay: true,
+    slidesToScroll: 3,
+    responsive: [
+      {
+        breakpoint: 1024,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 3,
+          infinite: true,
+          dots: true
+        }
+      },
+      {
+        breakpoint: 600,
+        settings: {
+          slidesToShow: 2,
+          slidesToScroll: 2,
+          infinite: true,
+          dots: true,
+          initialSlide: 2
+        }
+      },
+      {
+        breakpoint: 480,
+        settings: {
+          infinite: true,
+          dots: true,
+          slidesToShow: 1,
+          slidesToScroll: 1
+        }
+      }
+    ]
+  };
+
+  useEffect(() => {
+    const unsubscribe = onSnapshot(collection(db, "advert"), (snapshot) => {
+      const productsList = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      setAdvertProducts(productsList);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
   return (
     <>
       {/* if nt logged in
@@ -179,7 +231,23 @@ export default function Home() {
           }
 
 
-          <div className=" mt-[4rem]">
+          <div className=" w-full  mt-[4rem]">
+            <Slider className=" flex justify-center w-full items-center " {...settings}>
+              {advertProducts.map((product) => (
+                <div key={product.id} className="p-4 flex justify-center  w-full to-blue-900  bg-gradient-to-r from-[black] text-white shadow-md rounded-lg mx-2">
+                  <div className="w-full   h-[60vh] mb-4">
+                    <img
+                      src={product.imageUrl}
+                      alt={product.title}
+                      className="w-full object-contain object-center h-full rounded-t-lg"
+                    />
+                  </div>
+                  <h2 className="text-xl mx-auto flex justify-center font-semibold">{product.title}</h2>
+                  <p className="text-xl mx-auto flex justify-center font-semibold">{product.description}</p>
+                  <p className="text-xl mx-auto flex justify-center  text-green-600 font-bold">${product.price}</p>
+                </div>
+              ))}
+            </Slider>
 
             {categoriesNames.map(categoryName => (
               <div className="" key={categoryName}>
