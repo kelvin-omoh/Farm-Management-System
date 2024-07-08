@@ -3,9 +3,9 @@ import Layout from '@/app/components/farmer/Layout';
 import { db } from '@/app/firebase.config';
 import { addDoc, collection, deleteDoc, doc, onSnapshot, updateDoc } from 'firebase/firestore';
 import Image from 'next/image';
-import React, { useEffect, useState } from 'react'
 import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
 import { Carousel } from 'react-responsive-carousel';
+import { useEffect, useState } from 'react';
 
 const page = () => {
     const [items, setItems] = useState([]);
