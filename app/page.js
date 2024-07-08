@@ -232,6 +232,7 @@ export default function Home() {
 
 
           <div className=" w-full  mt-[4rem]">
+            <h1 className="mt-[3rem] ">Up coming products</h1>
             <Slider className=" flex justify-center w-full items-center " {...settings}>
               {advertProducts.map((product) => (
                 <div key={product.id} className="p-4 flex justify-center  w-full to-blue-900  bg-gradient-to-r from-[black] text-white shadow-md rounded-lg mx-2">
