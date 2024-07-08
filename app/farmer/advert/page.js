@@ -7,7 +7,7 @@ import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a lo
 import { Carousel } from 'react-responsive-carousel';
 import { useEffect, useState } from 'react';
 
-const page = () => {
+const Page = () => {
     const [items, setItems] = useState([]);
     const [products, setProducts] = useState([]);
     const [newProduct, setNewProduct] = useState({ title: "", description: "", price: "", imageUrl: "" });
@@ -195,4 +195,4 @@ const page = () => {
     )
 }
 
-export default page
+export default Page
